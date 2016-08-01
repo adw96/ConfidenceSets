@@ -1,7 +1,7 @@
 README
 
 This repository pertains to my confidence sets for phylogenetic trees paper:
-Willis, A. (2016). Confidence sets for phylogenetic trees. Submitted.
+Willis, A. (2016). Confidence sets for phylogenetic trees. arXiv:1607:08288.
 
 It is intended to document my code and analysis from Sections 5 and 6, including Table 1. 
 
