@@ -2,7 +2,7 @@
 
 This repository contains scripts and programs to reproduce select analyses from the paper:
 
-Willis, A. **Confidence Sets for Phylogenetic Trees.** *Journal of the American Statistical Association*, 114 (525), 235-244.
+Willis, A. [**Confidence Sets for Phylogenetic Trees.**](https://www.tandfonline.com/doi/abs/10.1080/01621459.2017.1395342?journalCode=uasa20) *Journal of the American Statistical Association*, 114 (525), 235-244.
 
 Scripts here particularly pertain to the results of Sections 5 and 6, including Table 1.
 

@@ -1,9 +1,13 @@
 *phyml_tree.txt
 *phyml_stats.txt
 Coverage/zika/generated20/split/zika_*
+Coverage/zika/generated20/true_mean*
+
+*.dat
 
 *.DS_Store
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+*.Rproj
