@@ -1,0 +1,9 @@
+*phyml_tree.txt
+*phyml_stats.txt
+Coverage/zika/generated20/split/zika_*
+
+*.DS_Store
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
