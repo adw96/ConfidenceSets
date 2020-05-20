@@ -46,7 +46,7 @@ batches <- 1000
 containsTruth <- rep(NA, batches)
 batchSize <- length(trees)/ batches
 trees <- list.files(path = "generated20/trees", full.names = T)
-for (batchNumber in 1:100) {
+for (batchNumber in 813:1000) {
 
   
   observations <- matrix(NA, ncol = mm, nrow = batchSize)
@@ -96,7 +96,12 @@ for (batchNumber in 1:100) {
 }
 
 nn=20
-100*c(mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.90, mm, nn-mm)),
-      mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.95, mm, nn-mm)),
-      mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.99, mm, nn-mm)),
-      mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.999, mm, nn-mm)))
+100*c(mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.90, mm, nn-mm)),
+      mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.95, mm, nn-mm)),
+      mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.99, mm, nn-mm)),
+      mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.999, mm, nn-mm)))
+
+100*c(mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.90, mm, nn-mm), na.rm=T),
+      mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.95, mm, nn-mm), na.rm=T),
+      mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.99, mm, nn-mm), na.rm=T),
+      mean(containsTruth < (mm*(nn-1))/(nn*(nn-mm))*qf(0.999, mm, nn-mm), na.rm=T))
