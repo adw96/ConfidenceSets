@@ -30,16 +30,14 @@ for (tree in trees) {
               row.names = F, quote = F, col.names = F)
 }
 
-## Step 2: run the Bacak algorithm for lots and lots of iterations on these trees
+## Step 2: run the Bacak algorithm for lots and lots of iterations (>10^6) on these trees
 ## and custom check for convergence. Save resulting true tree as base_tree_zika.txt.
 
 
-### Step 3: get the log map of the true tree and load in
-system('java -jar ../../TreePrograms/logmap.jar base_tree_zika.txt base_tree_zika.txt > base_tree_log_map.R')
+### Step 3: find m, call it mm
+system('java -jar ../../TreePrograms/logmap.jar base_tree_zika.txt base_tree_zika.txt | tail -n 1 > base_tree_log_map.R')
 source("base_tree_log_map.R")
-logMap # looks good; looks like base_tree_zika.txt
-mu0 <- logMap
-mm <- length(mu0)
+mm <- length(logMap)
 
 
 ## Step 4: create 1000 batches of 20 trees. Find the LM from
@@ -48,32 +46,57 @@ batches <- 1000
 containsTruth <- rep(NA, batches)
 batchSize <- length(trees)/ batches
 trees <- list.files(path = "generated20/trees", full.names = T)
-for (batchNumber in 1:batches) {
+for (batchNumber in 1:100) {
 
+  
   observations <- matrix(NA, ncol = mm, nrow = batchSize)
-
-  for (j in 1:batchSize) {
+  
+  # write the trees in the batch to a file 
+  path <- trees[(batchNumber - 1)*batchSize + 1]
+  the_tree <- as.character(read.table(path)[1,1])
+  write.table(convert_tree(the_tree),
+              paste("the_sample_of_trees_tmp.txt"),
+              row.names = F, quote = F, col.names = F, append = F)
+  for (j in 2:batchSize) {
     # write the tree to output
     path <- trees[(batchNumber - 1)*batchSize + j]
     the_tree <- as.character(read.table(path)[1,1])
     write.table(convert_tree(the_tree),
-                paste("the_tree_tmp.txt"),
-                row.names = F, quote = F, col.names = F, append = F)
+                paste("the_sample_of_trees_tmp.txt"),
+                row.names = F, quote = F, col.names = F, append = T)
 
-    # find log map of the tree from the base tree
-    system('java -jar ../../TreePrograms/logmap.jar base_tree_zika.txt the_tree_tmp.txt > new_tree_log_map.R')
+  }
+  
+  # find the sample Frechet mean
+  system('java -jar ../../TreePrograms/meantree.jar the_sample_of_trees_tmp.txt 0.0001 1000 > sample_mean_tmp.R')
+  system('cat sample_mean_tmp.R | head -n 1 > sample_mean_tree_tmp.txt')
+  system('cat sample_mean_tmp.R | tail -n 1 > sample_mean_lr_tmp.R')
+  
+  source("sample_mean_lr_tmp.R")
+  tree0 # this is the log map of the sample mean
+  
+  # find log map of the base tree from the sample mean
+  system('java -jar ../../TreePrograms/logmap.jar sample_mean_tree_tmp.txt base_tree_zika.txt | tail -n 1 > new_tree_log_map.R')
+  source("new_tree_log_map.R")
+  mu0 <- logMap # log map of true tree
+   
+  # find log map of each tree in the sample from the sample mean
+  for (j in 1:batchSize) {
+    system(paste("cat the_sample_of_trees_tmp.txt | head -n", j, " | tail -n 1 > jth_tree_tmp.txt"))
+    system('java -jar ../../TreePrograms/logmap.jar sample_mean_tree_tmp.txt jth_tree_tmp.txt | tail -n 1 > new_tree_log_map.R')
     source("new_tree_log_map.R")
     logMap
     observations[j, ] <- logMap
   }
-
+  observations
+  
   xbar = apply(observations, 2,  mean)
   S = cov(observations)
-  containsTruth_Zika_20[batchNumber] <- t(xbar - mu0)%*%solve(S)%*%(xbar - mu0)
+  containsTruth[batchNumber] <- t(xbar - mu0)%*%solve(S)%*%(xbar - mu0)
 }
 
-n=20
-100*c(mean(containsTruth_Zika_20 < (m*(n-1))/(n*(n-m))*qf(0.90, m, n-m)),
-      mean(containsTruth_Zika_20 < (m*(n-1))/(n*(n-m))*qf(0.95, m, n-m)),
-      mean(containsTruth_Zika_20 < (m*(n-1))/(n*(n-m))*qf(0.99, m, n-m)),
-      mean(containsTruth_Zika_20 < (m*(n-1))/(n*(n-m))*qf(0.999, m, n-m)))
+nn=20
+100*c(mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.90, mm, nn-mm)),
+      mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.95, mm, nn-mm)),
+      mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.99, mm, nn-mm)),
+      mean(containsTruth < (mm*(nn-1))/(n*(nn-mm))*qf(0.999, mm, nn-mm)))
